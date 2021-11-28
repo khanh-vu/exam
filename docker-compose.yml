@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+    db:
+        image: mysql:8.0.20
+        command: --default-authentication-plugin=mysql_native_password
+        volumes:
+            - "db_app:/var/lib/mysql"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: exam
+            MYSQL_USER: root
+            MYSQL_PASSWORD: root
+        ports:
+            - 3306:3306
+        networks:
+            - laravel_network
+    php:
+        build:
+            context: .
+            dockerfile: php/Dockerfile
+            args:
+                TIMEZONE: ${TIMEZONE}
+        volumes:
+            - ./../:/var/www/html/
+        networks:
+            - laravel_network
+    nginx:
+        build:
+            context: .
+            dockerfile: nginx/Dockerfile
+        volumes:
+            - ./../:/var/www/html/
+        ports:
+            - 8081:80
+            - 3000:3000
+        networks:
+            - laravel_network
+
+volumes:
+    db_app:
+
+networks:
+    laravel_network:
